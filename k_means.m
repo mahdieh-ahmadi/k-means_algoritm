@@ -2,111 +2,110 @@ clear all
 close all
 clc
 
-fid = dlmread('TrainData.txt');
+fid = dlmread('TrainData.txt'); 
+newfile = dlmread('TestData.txt');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%this code is for all size
+%%%%%%%%%%%% this code is for all numbers of vectores %%%%%%%%%%%%%%%%%%%%%
 
-dd=2;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 10 class %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% setting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+type = 4;%% 1 => random number , 2 => random from data , 3 => mean of each 2000 vectore , 4 => select manual
 
-if(dd == 2)
+    if(type == 1) %% rondom numder for centroid position
+        for i=1:1:10
+            k(i,:) = randi([0 1],[1 1200]);
+        end
+    elseif(type == 2)%%random vectore of data input for centroid position
+        for i=1:1:10
+            b = randi([1 20000]);
+            k(i,:) = fid(b,:);
+        end
+    elseif(type ==3) %% the avrage af each 2000 vectore for centroid position
+        for i=0:1:9
+            sum =  fid( (i*2000)+1:(i+1)*2000,:) ;
+            k(i+1,:) = mean(sum);
+        end
+    elseif(type == 4) %% select manual for centroid position
+    k(1,:) = fid(240,:);
+    k(2,:) = fid(34,:);
+    k(3,:) = fid(18,:);
+    k(4,:) = fid(40,:);
+    k(5,:) = fid(15,:);
+    k(6,:) = fid(1,:);
+    k(7,:) = fid(10,:);
+    k(8,:) = fid(38,:);
+    k(9,:) = fid(31,:);
+    k(10,:) = fid(9,:);
+    end
 
-    k(1,:) = randi([0 1],[1 1200]);
-    k(2,:) = randi([0 1],[1 1200]);
-    k(3,:) = randi([0 1],[1 1200]);
-    k(4,:) = randi([0 1],[1 1200]);
-    k(5,:) = randi([0 1],[1 1200]);
-    k(6,:) = randi([0 1],[1 1200]);
-    k(7,:) = randi([0 1],[1 1200]);
-    k(8,:) = randi([0 1],[1 1200]);
-    k(9,:) = randi([0 1],[1 1200]);
-    k(10,:) = randi([0 1],[1 1200]);
+    [a10,b10]=kmeans(fid , 10 , 'start' ,k ); %% start algorithm
+    
+    %%%%%%%%%%%%%%%%%%%%%%%% display algorithm %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      for i=1:1:10
+%         fff = b10(i,:);
+%         maindata = reshape(fff,30,40);
+%         figure
+%         imshow(maindata')
+%      end  
+     
+     
+     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     %%%%%%%%%%%%%%%%%%%%%%%%%%%% 20 class %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% setting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     type = 3;%% 1 => random number , 2 => random from data , 3 => mean of each 2000 vectore 
 
-    [a,b]=kmeans(fid , 10 , 'start' ,k );
+    if(type == 1) %% rondom numder for centroid position
+        for i=1:1:20
+            k(i,:) = randi([0 1],[1 1200]);
+        end
+    elseif(type == 2)%%random vectore of data input for centroid position
+        for i=1:1:20
+            b = randi([1 20000]);
+            k(i,:) = fid(b,:);
+        end
+    elseif(type ==3) %% the avrage af each 2000 vectore for centroid position
+        for i=0:1:19
+            sum =  fid((i*1000)+1:(i+1)*1000,:) ;
+            k(i+1,:) = mean(sum);
+        end
+    end
 
-     for i=1:1:10
+    [a20,b20]=kmeans(fid , 20 , 'start' ,k ); %% start algorithm
+    
+    %%%%%%%%%%%%%%%%%%%%%%%% display algorithm %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      for i=1:1:10
+%         fff = b20(i,:);
+%         maindata = reshape(fff,30,40);
+%         figure
+%         imshow(maindata')
+%      end  
+     
+     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     %%%%%%%%%%%%%%%%%%%%%%%%%% classify new data %%%%%%%%%%%%%%%%%%%%%%%%
+     s = size(newfile);
+     n = s(1);
+     classify = [];
+     b = [b10(1,:);b10(2,:);b10(3,:);b10(4,:);b20(5,:);b20(6,:);b20(7,:)];
+     
+     for i=1:1:7 %% display clasters
         fff = b(i,:);
         maindata = reshape(fff,30,40);
         figure
         imshow(maindata')
-     end  
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%this code is for to low number vector
-aaa = 0;
-
-if(aaa == 1)
-    
-    sizeData = size(fid);
-    n = sizeData(1);
-
-    knew = cell(1,10);
-    k = cell(1,10);
-
-    k{1,1} = randi([0 1],[1 1200]);
-    k{1,2} = randi([0 1],[1 1200]);
-    k{1,3} = randi([0 1],[1 1200]);
-    k{1,4} = randi([0 1],[1 1200]);
-    k{1,5} = randi([0 1],[1 1200]);
-    k{1,6} = randi([0 1],[1 1200]);
-    k{1,7} = randi([0 1],[1 1200]);
-    k{1,8} = randi([0 1],[1 1200]);
-    k{1,9} = randi([0 1],[1 1200]);
-    k{1,10} = randi([0 1],[1 1200]);
-
-    space = zeros(1,10);
-    Ji = inf;
-    Jiold = 0;
-
-    while (abs(Ji-Jiold) > 0.001)
-
-        Jiold = Ji;
-        group = cell(1,10);
-        for i=1:1:2000
-            newdata = fid(i,:);
-            for j=1:1:10
-                space(1,j) = norm(k{1,j}-newdata);
-            end
-            [value , number ] = min(space);
-            group{1,number} = [group{1,number};newdata];
+     end 
+     
+     for i=1:1:n
+        data = newfile(i,:);
+        sum = zeros(1,10);
+        for j=1:1:7
+            sum(1,j) = norm(data - b(j,:));
         end
-        for i=1:10
-            s = size(group{1,i});
-            if(s(1) == 0)
-                knew{1,i} = k{1,i};
-            elseif(s(1) == 1)
-                knew{1,i} = group{1,i};
-            else
-                knew{1,i} = mean(group{1,i});
-            end
-        end
-
-        Ji=0;
-        for i=1:1:10
-           s = size(group{1,i});
-           vectores = group{1,i};
-           sum = 0;
-           j = 1;
-           if(s(1) ~= 0)
-               for j=1:1:s(1)
-                 sum = sum + norm( vectores(j,:)- mean(vectores))^2;
-               end
-           end
-
-           sum = sum / j;
-           Ji = Ji+sum;
-        end
-
-        k = knew;
-    end
-
-    for i=1:1:10
-        fff = k{1,i};
-        maindata = reshape(fff,30,40);
-        figure
-        imshow(maindata')
-    end  
-end
-
-
+        [value , number ] = min(sum);
+        classify = [classify;number];
+     end
+     
+     
