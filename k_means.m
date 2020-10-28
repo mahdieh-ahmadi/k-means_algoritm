@@ -8,27 +8,26 @@ newfile = dlmread('TestData.txt');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%% this code is for all numbers of vectores %%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 10 class %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% setting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-type = 4;%% 1 => random number , 2 => random from data , 3 => mean of each 2000 vectore , 4 => select manual
+type = 3;%% 1 => random number , 2 => random from data , 3 => avrage of each 2000 vectore , 4 => select manual
+count = 20; %% select the number of claster
 
     if(type == 1) %% rondom numder for centroid position
-        for i=1:1:10
+        for i=1:1:count
             k(i,:) = randi([0 1],[1 1200]);
         end
     elseif(type == 2)%%random vectore of data input for centroid position
-        for i=1:1:10
+        for i=1:1:count
             b = randi([1 20000]);
             k(i,:) = fid(b,:);
         end
     elseif(type ==3) %% the avrage af each 2000 vectore for centroid position
-        for i=0:1:9
-            sum =  fid( (i*2000)+1:(i+1)*2000,:) ;
+        for i=0:1:count-1
+            sum =  fid( (i*(10/count)*2000)+1:(i+1)*(10/count)*2000,:) ;
             k(i+1,:) = mean(sum);
         end
-    elseif(type == 4) %% select manual for centroid position
+    elseif(type == 4 && count == 10) %% select manual for centroid position for 10 claster
     k(1,:) = fid(240,:);
     k(2,:) = fid(34,:);
     k(3,:) = fid(18,:);
@@ -41,67 +40,36 @@ type = 4;%% 1 => random number , 2 => random from data , 3 => mean of each 2000 
     k(10,:) = fid(9,:);
     end
 
-    [a10,b10]=kmeans(fid , 10 , 'start' ,k ); %% start algorithm
+    [a,b]=kmeans(fid , count , 'start' ,k ); %% start algorithm
     
     %%%%%%%%%%%%%%%%%%%%%%%% display algorithm %%%%%%%%%%%%%%%%%%%%%%%%%%%
-%      for i=1:1:10
-%         fff = b10(i,:);
-%         maindata = reshape(fff,30,40);
-%         figure
-%         imshow(maindata')
-%      end  
+     for i=1:1:count
+        fff = b(i,:);
+        maindata = reshape(fff,30,40);
+        subplot(count/10,10,i)
+        imshow(maindata')
+     end  
      
      
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%% 20 class %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% setting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     type = 3;%% 1 => random number , 2 => random from data , 3 => mean of each 2000 vectore 
-
-    if(type == 1) %% rondom numder for centroid position
-        for i=1:1:20
-            k(i,:) = randi([0 1],[1 1200]);
-        end
-    elseif(type == 2)%%random vectore of data input for centroid position
-        for i=1:1:20
-            b = randi([1 20000]);
-            k(i,:) = fid(b,:);
-        end
-    elseif(type ==3) %% the avrage af each 2000 vectore for centroid position
-        for i=0:1:19
-            sum =  fid((i*1000)+1:(i+1)*1000,:) ;
-            k(i+1,:) = mean(sum);
-        end
-    end
-
-    [a20,b20]=kmeans(fid , 20 , 'start' ,k ); %% start algorithm
-    
-    %%%%%%%%%%%%%%%%%%%%%%%% display algorithm %%%%%%%%%%%%%%%%%%%%%%%%%%%
-%      for i=1:1:10
-%         fff = b20(i,:);
-%         maindata = reshape(fff,30,40);
-%         figure
-%         imshow(maindata')
-%      end  
      
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %%%%%%%%%%%%%%%%%%%%%%%%%% classify new data %%%%%%%%%%%%%%%%%%%%%%%%
      s = size(newfile);
      n = s(1);
      classify = [];
-     b = [b10(1,:);b10(2,:);b10(3,:);b10(4,:);b20(5,:);b20(6,:);b20(7,:)];
-     
-     for i=1:1:7 %% display clasters
-        fff = b(i,:);
+%      b = [b10(1,:);b10(2,:);b10(3,:);b10(4,:);b20(5,:);b20(6,:);b20(7,:)];
+     figure
+     for i=1:1:n %% display clasters
+        fff = newfile(i,:);
         maindata = reshape(fff,30,40);
-        figure
+        subplot(2,10,i)
         imshow(maindata')
      end 
      
      for i=1:1:n
         data = newfile(i,:);
         sum = zeros(1,10);
-        for j=1:1:7
+        for j=1:1:count
             sum(1,j) = norm(data - b(j,:));
         end
         [value , number ] = min(sum);
